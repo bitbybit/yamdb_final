@@ -15,4 +15,7 @@ class User(AbstractUser):
         default='user'
     )
     email = models.EmailField(unique=True)
-
+    bio = models.TextField(
+        'Биография',
+        blank=True,
+    )
