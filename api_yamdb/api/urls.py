@@ -6,4 +6,4 @@ from .views import UserViewSet
 router = SimpleRouter()
 router.register("users", UserViewSet)
 
-urlpatterns = [path("v1/", include(router.urls))]
+urlpatterns = [path("", include(router.urls))]
