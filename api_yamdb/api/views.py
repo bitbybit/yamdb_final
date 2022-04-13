@@ -1,9 +1,9 @@
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.models import User
+from reviews.models import Title, User
 
-from .serializers import UserSerializer
+from .serializers import TitleSerializer, UserSerializer
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -25,3 +25,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
