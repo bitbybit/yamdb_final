@@ -29,8 +29,8 @@ pip3 install pytest flake8 pep8-naming flake8-broken-line flake8-return flake8-i
 
 - Файл должен быть исполняемым: `chmod +x .git/hooks/pre-commit`
 - Если `mypy` ругается на внутренние импорты Django, а все остальное правильно,
-  можно сделать коммит с ключом `--no-verify` (
-  нежелательно): `git commit --no-verify -m 'commit message'`
+  можно сделать коммит с ключом `--no-verify`
+  (нежелательно): `git commit --no-verify -m 'commit message'`
 
 ```
 #!/bin/bash
@@ -73,9 +73,9 @@ done
    ревьюверов (cross-review)
 6. В название пул реквеста скопировать название задачи (если задача выполнена
    частично, то вкратце перечислить, что сделано)
-7. На странице таска справа в блоке **Power-Ups** - **GitHub** кликнуть **
-   Attach Pull Request**, выбрать созданный пулл реквест (Trello сам их
-   слинкует)
+7. На странице таска справа в блоке **Power-Ups** - **GitHub** кликнуть
+   **Attach Pull Request**, выбрать созданный пулл реквест
+   (Trello сам их слинкует)
 
 ### Таски
 
