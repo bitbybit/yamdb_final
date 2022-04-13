@@ -32,7 +32,7 @@ pip3 install pytest flake8 pep8-naming flake8-broken-line flake8-return flake8-i
 ```
 #!/bin/bash
 
-for file in $(git diff --diff-filter=d --cached --name-only | grep -E '\\.py$')
+for file in $(git diff --diff-filter=d --cached --name-only | grep -E '\.py$')
 do
   git show ":$file" | black -l 79 "$file"
   
