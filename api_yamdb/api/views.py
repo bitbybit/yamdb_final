@@ -1,8 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from reviews.models import Title, User
 
+from .filtersets import TitleFilter
 from .serializers import TitleSerializer, UserSerializer
 
 """
@@ -30,3 +32,5 @@ class UserViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TitleFilter
