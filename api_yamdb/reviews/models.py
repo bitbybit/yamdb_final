@@ -12,7 +12,7 @@ class User(AbstractUser):
         max_length=25,
         verbose_name="роль пользователя",
         choices=ROLE_CHOICES,
-        default="user"
+        default="user",
     )
     email = models.EmailField(unique=True)
     bio = models.TextField(
@@ -42,4 +42,24 @@ class Title(models.Model):
         related_name="titles",
         blank=True,
         null=True,
+    )
+
+
+class Review(models.Model):
+    text = models.TextField()
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    score = models.IntegerField()
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        blank=False,
+        null=False,
     )
