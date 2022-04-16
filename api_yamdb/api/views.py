@@ -1,14 +1,18 @@
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.models import Title, User, Genre
 
+from reviews.models import Genre, Review, Title, User
 from .filtersets import TitleFilter
+from .permissions import IsAdminOrReadOnly
 from .serializers import (
+    GenreSerializer,
+    ReviewSerializer,
     TitleSerializer,
     UserSerializer,
-    GenreSerializer,
 )
 
 """
@@ -44,5 +48,23 @@ class GenreViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+        reviews = title.reviews.all()
+        return reviews
+
+    def perform_create(self, serializer):
+        author = self.request.user
+        title_id = self.kwargs.get("title_id")
+        review_exists = Review.objects.filter(author=author, title_id=title_id)
+        if not review_exists:
+            serializer.save(author=author, title_id=title_id)
+        else:
+            raise PermissionDenied

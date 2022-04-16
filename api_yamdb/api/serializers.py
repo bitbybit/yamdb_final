@@ -3,7 +3,7 @@ from typing import Optional
 
 from django.db.models import Avg
 from rest_framework import serializers
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -91,3 +91,9 @@ class TitleSerializer(serializers.ModelSerializer):
             "category",
         )
         model = Title
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = Review
