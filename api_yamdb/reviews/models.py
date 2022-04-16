@@ -8,17 +8,19 @@ class User(AbstractUser):
         ("moderator", "модератор"),
         ("admin", "администратор"),
     )
+
     role = models.CharField(
         max_length=25,
-        verbose_name="роль пользователя",
+        verbose_name="Роль пользователя",
         choices=ROLE_CHOICES,
         default="user",
     )
     email = models.EmailField(unique=True)
     bio = models.TextField(
-        "Биография",
+        verbose_name="Биография",
         blank=True,
     )
+    confirmation_code = models.CharField(max_length=32, blank=True)
 
 
 class Genre(models.Model):

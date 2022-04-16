@@ -2,11 +2,17 @@ import datetime as dt
 from typing import Optional
 
 from django.db.models import Avg
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Title, User
+
+from .validators import validate_username
 
 
 class UserSerializer(serializers.ModelSerializer):
+    def validate_username(self, value):
+        return validate_username(value)
+
     class Meta:
         fields = (
             "username",
@@ -16,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
             "bio",
             "role",
         )
+        read_only_fields = ("role",)
         model = User
 
 
@@ -72,13 +79,13 @@ class TitleSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         return self.process_data(validated_data, instance)
 
-    def validate(self, attrs):
-        if attrs["year"] > dt.datetime.now().year:
+    def validate_year(self, value):
+        if value > dt.datetime.now().year:
             raise serializers.ValidationError(
                 "Год выпуска не может быть больше текущего."
             )
 
-        return attrs
+        return value
 
     class Meta:
         fields = (
@@ -91,3 +98,44 @@ class TitleSerializer(serializers.ModelSerializer):
             "category",
         )
         model = Title
+
+
+class AuthUserSignUpSerializer(serializers.ModelSerializer):
+    def validate_username(self, value):
+        return validate_username(value)
+
+    class Meta:
+        fields = (
+            "username",
+            "email",
+        )
+        model = User
+
+
+class AuthUserTokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True, trim_whitespace=True)
+    confirmation_code = serializers.CharField(
+        required=True, trim_whitespace=True
+    )
+
+    def validate(self, attrs):
+        data = attrs
+
+        try:
+            user = User.objects.get(
+                username=data.get("username"),
+                confirmation_code=data.get("confirmation_code"),
+            )
+        except User.DoesNotExist:
+            raise exceptions.NotFound("Пользователь не найден.")
+
+        refresh = RefreshToken.for_user(user)
+
+        return {"token": str(refresh.access_token)}
+
+    class Meta:
+        fields = (
+            "username",
+            "confirmation_code",
+        )
+        model = User
