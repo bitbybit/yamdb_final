@@ -2,10 +2,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.models import Title, User
+from reviews.models import Title, User, Genre
 
 from .filtersets import TitleFilter
-from .serializers import TitleSerializer, UserSerializer
+from .serializers import (
+    TitleSerializer,
+    UserSerializer,
+    GenreSerializer,
+)
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -34,3 +38,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = TitleFilter
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ("name",)
