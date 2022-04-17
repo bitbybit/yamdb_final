@@ -54,13 +54,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-    # TODO: CreateDestroyListModelViewSet?
+class GenreViewSet(CreateDestroyListModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class CategoryViewSet(CreateDestroyListModelViewSet):
