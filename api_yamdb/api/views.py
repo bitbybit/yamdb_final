@@ -1,4 +1,3 @@
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
@@ -68,14 +67,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
-        reviews = title.reviews.all()
-        return reviews
+
+        return title.reviews
 
     def perform_create(self, serializer):
-        author = self.request.user
-        title_id = self.kwargs.get("title_id")
-        review_exists = Review.objects.filter(author=author, title_id=title_id)
-        if not review_exists:
-            serializer.save(author=author, title_id=title_id)
-        else:
-            raise PermissionDenied
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+        serializer.save(author=self.request.user, title=title)

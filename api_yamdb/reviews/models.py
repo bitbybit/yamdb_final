@@ -54,7 +54,10 @@ class Review(models.Model):
         related_name="reviews",
     )
     score = models.IntegerField(
-        validators=[MaxValueValidator(10), MinValueValidator(1)]
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10),
+        ]
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -66,3 +69,10 @@ class Review(models.Model):
         blank=False,
         null=False,
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "title"], name="unique_review"
+            )
+        ]
