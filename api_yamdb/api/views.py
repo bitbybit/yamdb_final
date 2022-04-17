@@ -4,16 +4,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from reviews.models import Category, Genre, Review, Title, User
 
-from reviews.models import Genre, Review, Title, User
 from .filtersets import TitleFilter
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
+    CategorySerializer,
     GenreSerializer,
     ReviewSerializer,
     TitleSerializer,
     UserSerializer,
 )
+from .viewsets import CreateDestroyListModelViewSet
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -45,11 +47,20 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+
+class CategoryViewSet(CreateDestroyListModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
