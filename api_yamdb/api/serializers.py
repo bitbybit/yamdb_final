@@ -29,13 +29,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = "__all__"
+        fields = ("name", "slug")
         model = Genre
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = "__all__"
+        fields = ("name", "slug")
         model = Category
 
 
@@ -44,12 +44,12 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         many=True,
         required=True,
-        slug_field="name",
+        slug_field="slug",
     )
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         required=True,
-        slug_field="name",
+        slug_field="slug",
     )
     rating = serializers.SerializerMethodField()
 
@@ -59,18 +59,26 @@ class TitleSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def process_data(validated_data, instance=None):
-        genre = validated_data.pop("genre")
+        try:
+            genre = validated_data.pop("genre")
+        except KeyError:
+            genre = []
 
         if instance is None:
             title = Title.objects.create(**validated_data)
         else:
             title = instance
 
-        title.genre.clear()
+        if len(genre) > 0:
+            title.genre.clear()
 
-        for genre_item in genre:
-            title.genre.add(genre_item)
-            title.save()
+            for genre_item in genre:
+                title.genre.add(genre_item)
+
+        for attr, value in validated_data.items():
+            setattr(title, attr, value)
+
+        title.save()
 
         return title
 
@@ -87,6 +95,12 @@ class TitleSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+    def to_representation(self, obj: Title):
+        self.fields["genre"] = GenreSerializer(many=True)
+        self.fields["category"] = CategorySerializer()
+
+        return super().to_representation(obj)
 
     class Meta:
         fields = (
