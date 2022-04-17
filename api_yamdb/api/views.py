@@ -2,11 +2,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.models import Category, Title, User
+from reviews.models import Category, Genre, Title, User
 
 from .filtersets import TitleFilter
 from .mixins import CreateRetrieveModelMixin
-from .serializers import CategorySerializer, TitleSerializer, UserSerializer
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    UserSerializer,
+)
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -35,6 +40,14 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = TitleFilter
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
 
 
 class CategoryViewSet(CreateRetrieveModelMixin):

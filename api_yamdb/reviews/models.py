@@ -8,7 +8,6 @@ class User(AbstractUser):
         ("moderator", "модератор"),
         ("admin", "администратор"),
     )
-
     role = models.CharField(
         max_length=25,
         verbose_name="роль пользователя",
@@ -24,7 +23,7 @@ class User(AbstractUser):
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
 
 
 class Category(models.Model):
