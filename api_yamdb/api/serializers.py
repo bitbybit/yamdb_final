@@ -1,6 +1,7 @@
 import datetime as dt
 from typing import Optional
 
+from django.db import IntegrityError
 from django.db.models import Avg
 from rest_framework import serializers
 from reviews.models import Category, Genre, Review, Title, User
@@ -94,6 +95,12 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    def save(self, **kwargs):
+        try:
+            super().save(**kwargs)
+        except IntegrityError:
+            raise serializers.ValidationError("Отзыв уже существует.")
+
     class Meta:
         fields = "__all__"
         model = Review
