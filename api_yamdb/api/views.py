@@ -1,14 +1,16 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 from .filtersets import TitleFilter
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
+    ReviewSerializer,
     TitleSerializer,
     UserSerializer,
 )
@@ -58,3 +60,17 @@ class CategoryViewSet(CreateDestroyListModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
     lookup_field = "slug"
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+        return title.reviews
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+        serializer.save(author=self.request.user, title=title)
