@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from reviews.models import Category, Genre, Title, User
 
 from .filtersets import TitleFilter
-from .mixins import CreateRetrieveModelMixin
+from .permissions import IsAdminOrReadOnly
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
     UserSerializer,
 )
+from .viewsets import CreateDestroyListModelViewSet
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -43,15 +44,15 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
 
-class CategoryViewSet(CreateRetrieveModelMixin):
-    # permission_classes = [IsAdminOrReadOnly]
+class CategoryViewSet(CreateDestroyListModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
