@@ -5,6 +5,7 @@ from .views import (
     AuthSignUpViewSet,
     AuthTokenViewSet,
     CategoryViewSet,
+    CommentViewSet,
     GenreViewSet,
     ReviewViewSet,
     TitleViewSet,
@@ -16,8 +17,10 @@ router.register("users", UserViewSet)
 router.register("titles", TitleViewSet)
 router.register("categories", CategoryViewSet)
 router.register("genres", GenreViewSet)
+router.register(r"titles/(?P<title_id>\d+)/reviews", ReviewViewSet)
 router.register(
-    r"titles/(?P<title_id>\d+)/reviews", ReviewViewSet, basename="review"
+    r"titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments",
+    CommentViewSet,
 )
 router.register("auth/signup", AuthSignUpViewSet)
 

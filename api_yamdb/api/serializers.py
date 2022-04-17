@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.db.models import Avg
 from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .validators import validate_username
 
@@ -157,6 +157,11 @@ class AuthUserTokenSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="username",
+    )
+
     def save(self, **kwargs):
         try:
             super().save(**kwargs)
@@ -164,5 +169,16 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Отзыв уже существует.")
 
     class Meta:
-        fields = "__all__"
+        fields = ("id", "text", "author", "score", "pub_date")
         model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="username",
+    )
+
+    class Meta:
+        fields = ("id", "text", "author", "pub_date")
+        model = Comment
