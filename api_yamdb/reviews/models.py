@@ -78,3 +78,22 @@ class Review(models.Model):
                 fields=["author", "title"], name="unique_review"
             )
         ]
+
+
+class Comment(models.Model):
+    text = models.TextField(blank=False)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        blank=False,
+        null=False,
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+    )
