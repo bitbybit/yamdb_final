@@ -60,6 +60,7 @@ class GenreViewSet(CreateDestroyListModelViewSet):
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+    lookup_field = "slug"
 
 
 class CategoryViewSet(CreateDestroyListModelViewSet):
