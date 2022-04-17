@@ -1,10 +1,11 @@
 import datetime as dt
 from typing import Optional
 
+from django.db import IntegrityError
 from django.db.models import Avg
 from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 from .validators import validate_username
 
@@ -139,3 +140,15 @@ class AuthUserTokenSerializer(serializers.ModelSerializer):
             "confirmation_code",
         )
         model = User
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    def save(self, **kwargs):
+        try:
+            super().save(**kwargs)
+        except IntegrityError:
+            raise serializers.ValidationError("Отзыв уже существует.")
+
+    class Meta:
+        fields = "__all__"
+        model = Review

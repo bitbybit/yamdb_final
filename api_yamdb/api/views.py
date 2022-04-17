@@ -1,23 +1,26 @@
 from uuid import uuid4
 
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from reviews.models import Genre, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 
 from .filtersets import TitleFilter
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
     AuthUserSignUpSerializer,
     AuthUserTokenSerializer,
+    CategorySerializer,
     GenreSerializer,
+    ReviewSerializer,
     TitleSerializer,
     UserSerializer,
 )
-from .viewsets import CreateModelViewSet
+from .viewsets import CreateDestroyListModelViewSet, CreateModelViewSet
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -49,11 +52,35 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    # TODO: CreateDestroyListModelViewSet?
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
+
+
+class CategoryViewSet(CreateDestroyListModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ("name",)
+    lookup_field = "slug"
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+        return title.reviews
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+        serializer.save(author=self.request.user, title=title)
 
 
 class AuthSignUpViewSet(CreateModelViewSet):
