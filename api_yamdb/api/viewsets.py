@@ -8,3 +8,7 @@ class CreateDestroyListModelViewSet(
     viewsets.GenericViewSet,
 ):
     pass
+
+
+class CreateModelViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    pass

@@ -1,20 +1,26 @@
+from uuid import uuid4
+
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from reviews.models import Category, Genre, Review, Title, User
 
 from .filtersets import TitleFilter
 from .permissions import IsAdminOrReadOnly
 from .serializers import (
+    AuthUserSignUpSerializer,
+    AuthUserTokenSerializer,
     CategorySerializer,
     GenreSerializer,
     ReviewSerializer,
     TitleSerializer,
     UserSerializer,
 )
-from .viewsets import CreateDestroyListModelViewSet
+from .viewsets import CreateDestroyListModelViewSet, CreateModelViewSet
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -46,6 +52,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
+    # TODO: CreateDestroyListModelViewSet?
     permission_classes = (IsAdminOrReadOnly,)
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -74,3 +81,55 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
 
         serializer.save(author=self.request.user, title=title)
+
+
+class AuthSignUpViewSet(CreateModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    queryset = User.objects.all()
+    serializer_class = AuthUserSignUpSerializer
+
+    @staticmethod
+    def generate_confirmation_code() -> str:
+        return uuid4().hex
+
+    @staticmethod
+    def send_confirmation_code(email_to: str, confirmation_code: str):
+        email_from = "api@yamdb.yamdb"
+        subject = "Код подтверждения"
+
+        send_mail(
+            subject,
+            confirmation_code,
+            email_from,
+            [email_to],
+            fail_silently=False,
+        )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        confirmation_code = self.generate_confirmation_code()
+
+        try:
+            user = User.objects.get(
+                username=serializer.initial_data.get("username"),
+                email=serializer.initial_data.get("email"),
+            )
+            user.confirmation_code = confirmation_code
+            user.save()
+        except User.DoesNotExist:
+            serializer.is_valid(raise_exception=True)
+            serializer.save(confirmation_code=confirmation_code)
+
+        self.send_confirmation_code(
+            serializer.initial_data["email"], confirmation_code
+        )
+
+        headers = self.get_success_headers(serializer.initial_data)
+
+        return Response(
+            serializer.initial_data, status=status.HTTP_200_OK, headers=headers
+        )
+
+
+class AuthTokenViewSet(TokenObtainPairView):
+    serializer_class = AuthUserTokenSerializer

@@ -2,6 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
+    AuthSignUpViewSet,
+    AuthTokenViewSet,
     CategoryViewSet,
     GenreViewSet,
     ReviewViewSet,
@@ -17,4 +19,9 @@ router.register("genres", GenreViewSet)
 router.register(
     r"titles/(?P<title_id>\d+)/reviews", ReviewViewSet, basename="review"
 )
-urlpatterns = [path("", include(router.urls))]
+router.register("auth/signup", AuthSignUpViewSet)
+
+urlpatterns = [
+    path("", include(router.urls)),
+    path("auth/token/", AuthTokenViewSet.as_view()),
+]
