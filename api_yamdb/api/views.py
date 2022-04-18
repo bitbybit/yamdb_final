@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -18,11 +18,15 @@ from .serializers import (
     CategorySerializer,
     CommentSerializer,
     GenreSerializer,
+    MeSerializer,
     ReviewSerializer,
     TitleSerializer,
     UserSerializer,
 )
-from .viewsets import CreateDestroyListModelViewSet, CreateModelViewSet
+from .viewsets import (
+    CreateDestroyListModelViewSet,
+    CreateModelViewSet,
+)
 
 """
 TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
@@ -39,11 +43,20 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ("username",)
     lookup_field = "username"
 
-    @action(detail=True, methods=["get", "patch"])
-    def me(self, request):
+
+class APIMe(views.APIView):
+    def get(self, request):
         user = self.request.user
-        serializer = self.get_serializer(user)
+        serializer = MeSerializer(user)
         return Response(serializer.data)
+
+    def patch(self, request, pk=None):
+        user = self.request.user
+        serializer = MeSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

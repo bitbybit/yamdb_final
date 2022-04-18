@@ -7,6 +7,7 @@ from .views import (
     CategoryViewSet,
     CommentViewSet,
     GenreViewSet,
+    APIMe,
     ReviewViewSet,
     TitleViewSet,
     UserViewSet,
@@ -27,4 +28,5 @@ router.register("auth/signup", AuthSignUpViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("auth/token/", AuthTokenViewSet.as_view()),
+    path("users/me", APIMe.as_view()),
 ]
