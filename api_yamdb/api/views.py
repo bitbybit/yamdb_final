@@ -3,40 +3,24 @@ from uuid import uuid4
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, viewsets, views
-from rest_framework.decorators import action
+from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .filtersets import TitleFilter
-from .permissions import IsAdminOrAuthor, IsAdminOrReadOnly
-from .serializers import (
-    AuthUserSignUpSerializer,
-    AuthUserTokenSerializer,
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    MeSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-    UserSerializer,
-)
-from .viewsets import (
-    CreateDestroyListModelViewSet,
-    CreateModelViewSet,
-)
-
-"""
-TODO: после реализации аутентификации протестировать работу эндпоинта users/me,
-поле role должно быть доступно только при GET запросе, юзер не может менять
-роль. можно для PATCH запроса использовать отдельный сериализатор, в котором
-поле role будет отсутствовать.
-"""
+from .permissions import IsAdmin, IsAdminOrAuthor, IsAdminOrReadOnly
+from .serializers import (AuthUserSignUpSerializer, AuthUserTokenSerializer,
+                          CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          UserMeSerializer, UserSerializer)
+from .viewsets import CreateDestroyListModelViewSet, CreateModelViewSet
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAdmin,)
+    pagination_class = LimitOffsetPagination
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
@@ -44,15 +28,15 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
 
 
-class APIMe(views.APIView):
+class UserMeView(views.APIView):
     def get(self, request):
         user = self.request.user
-        serializer = MeSerializer(user)
+        serializer = UserMeSerializer(user, many=False)
         return Response(serializer.data)
 
     def patch(self, request, pk=None):
         user = self.request.user
-        serializer = MeSerializer(user, data=request.data, partial=True)
+        serializer = UserMeSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

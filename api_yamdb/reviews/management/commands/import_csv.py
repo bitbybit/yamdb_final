@@ -3,6 +3,7 @@ import os
 from typing import Dict
 
 from django.core.management.base import BaseCommand, CommandError
+
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 BASE_DIR = os.path.dirname(

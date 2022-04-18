@@ -23,6 +23,9 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(max_length=32, blank=True)
 
+    class Meta:
+        ordering = ["-id"]
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
