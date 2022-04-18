@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reviews', '0004_comment'),
+        ("reviews", "0004_comment"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='category',
-            options={'ordering': ['-id']},
+            name="category",
+            options={"ordering": ["-id"]},
         ),
         migrations.AlterModelOptions(
-            name='genre',
-            options={'ordering': ['-id']},
+            name="genre",
+            options={"ordering": ["-id"]},
         ),
     ]
