@@ -3,29 +3,19 @@ from uuid import uuid4
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, status, viewsets, views
+from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .filtersets import TitleFilter
-from .permissions import IsAdminOrAuthor, IsAdminOrReadOnly, IsAdmin
-from .serializers import (
-    AuthUserSignUpSerializer,
-    AuthUserTokenSerializer,
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    UserMeSerializer,
-    ReviewSerializer,
-    TitleSerializer,
-    UserSerializer,
-)
-from .viewsets import (
-    CreateDestroyListModelViewSet,
-    CreateModelViewSet,
-)
+from .permissions import IsAdmin, IsAdminOrAuthor, IsAdminOrReadOnly
+from .serializers import (AuthUserSignUpSerializer, AuthUserTokenSerializer,
+                          CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer,
+                          UserMeSerializer, UserSerializer)
+from .viewsets import CreateDestroyListModelViewSet, CreateModelViewSet
 
 
 class UserViewSet(viewsets.ModelViewSet):
