@@ -8,37 +8,57 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reviews', '0002_category_genre_review_title'),
+        ("reviews", "0002_category_genre_review_title"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='confirmation_code',
+            model_name="user",
+            name="confirmation_code",
             field=models.CharField(blank=True, max_length=32),
         ),
         migrations.AlterField(
-            model_name='review',
-            name='score',
-            field=models.IntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(10)]),
+            model_name="review",
+            name="score",
+            field=models.IntegerField(
+                validators=[
+                    django.core.validators.MinValueValidator(1),
+                    django.core.validators.MaxValueValidator(10),
+                ]
+            ),
         ),
         migrations.AlterField(
-            model_name='review',
-            name='title',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.Title'),
+            model_name="review",
+            name="title",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reviews",
+                to="reviews.Title",
+            ),
         ),
         migrations.AlterField(
-            model_name='title',
-            name='description',
+            model_name="title",
+            name="description",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='role',
-            field=models.CharField(choices=[('user', 'пользователь'), ('moderator', 'модератор'), ('admin', 'администратор')], default='user', max_length=25, verbose_name='Роль пользователя'),
+            model_name="user",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("user", "пользователь"),
+                    ("moderator", "модератор"),
+                    ("admin", "администратор"),
+                ],
+                default="user",
+                max_length=25,
+                verbose_name="Роль пользователя",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='review',
-            constraint=models.UniqueConstraint(fields=('author', 'title'), name='unique_review'),
+            model_name="review",
+            constraint=models.UniqueConstraint(
+                fields=("author", "title"), name="unique_review"
+            ),
         ),
     ]
