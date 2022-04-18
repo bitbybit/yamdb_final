@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
             "bio",
             "role",
         )
-        read_only_fields = ("role",)
         model = User
 
 
@@ -137,12 +136,17 @@ class AuthUserTokenSerializer(serializers.ModelSerializer):
         data = attrs
 
         try:
+            User.objects.get(username=data.get("username"))
+        except User.DoesNotExist:
+            raise exceptions.NotFound("Пользователь не найден.")
+
+        try:
             user = User.objects.get(
                 username=data.get("username"),
                 confirmation_code=data.get("confirmation_code"),
             )
         except User.DoesNotExist:
-            raise exceptions.NotFound("Пользователь не найден.")
+            raise exceptions.ValidationError("Некорректный код подтверждения.")
 
         refresh = RefreshToken.for_user(user)
 

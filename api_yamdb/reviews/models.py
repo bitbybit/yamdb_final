@@ -28,10 +28,16 @@ class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
+    class Meta:
+        ordering = ["-id"]
+
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ["-id"]
 
 
 class Title(models.Model):
