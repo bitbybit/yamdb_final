@@ -16,6 +16,7 @@ pip3 install djangorestframework-simplejwt
 
 cd api_yamdb
 python manage.py migrate
+python manage.py import_csv
 
 python3 manage.py runserver
 ```
