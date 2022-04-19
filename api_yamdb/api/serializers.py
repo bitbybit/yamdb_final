@@ -1,5 +1,4 @@
 import datetime as dt
-from typing import Optional
 
 from django.db import IntegrityError
 from django.db.models import Avg
@@ -67,7 +66,7 @@ class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_rating(obj: Title) -> Optional[int]:
+    def get_rating(obj: Title):
         return obj.reviews.aggregate(Avg("score"))["score__avg"]
 
     @staticmethod
@@ -82,7 +81,7 @@ class TitleSerializer(serializers.ModelSerializer):
         else:
             title = instance
 
-        if len(genre) > 0:
+        if genre:
             title.genre.clear()
 
             for genre_item in genre:
@@ -149,17 +148,12 @@ class AuthUserTokenSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = attrs
 
-        try:
-            User.objects.get(username=data.get("username"))
-        except User.DoesNotExist:
+        if not User.objects.filter(username=data.get("username")).exists():
             raise exceptions.NotFound("Пользователь не найден.")
 
-        try:
-            user = User.objects.get(
-                username=data.get("username"),
-                confirmation_code=data.get("confirmation_code"),
-            )
-        except User.DoesNotExist:
+        user = User.objects.get(username=data.get("username"))
+
+        if user.confirmation_code != data.get("confirmation_code"):
             raise exceptions.ValidationError("Некорректный код подтверждения.")
 
         refresh = RefreshToken.for_user(user)
