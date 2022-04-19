@@ -110,7 +110,7 @@ class AuthSignUpViewSet(CreateModelViewSet):
     serializer_class = AuthUserSignUpSerializer
 
     @staticmethod
-    def generate_confirmation_code() -> str:
+    def generate_confirmation_code():
         return uuid4().hex
 
     @staticmethod
@@ -130,14 +130,16 @@ class AuthSignUpViewSet(CreateModelViewSet):
         serializer = self.get_serializer(data=request.data)
         confirmation_code = self.generate_confirmation_code()
 
-        try:
-            user = User.objects.get(
-                username=serializer.initial_data.get("username"),
-                email=serializer.initial_data.get("email"),
-            )
+        user_filter_params = {
+            "username": serializer.initial_data.get("username"),
+            "email": serializer.initial_data.get("email"),
+        }
+
+        if User.objects.filter(**user_filter_params).exists():
+            user = User.objects.get(**user_filter_params)
             user.confirmation_code = confirmation_code
             user.save()
-        except User.DoesNotExist:
+        else:
             serializer.is_valid(raise_exception=True)
             serializer.save(confirmation_code=confirmation_code)
 
