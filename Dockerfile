@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.7
 
 RUN mkdir /app
 
@@ -11,7 +11,4 @@ COPY api_yamdb/ /app
 
 WORKDIR /app
 
-RUN python3 manage.py migrate
-RUN python manage.py import_csv
-
-CMD ["python3", "manage.py", "runserver", "0:8000"]
+CMD ["gunicorn", "api_yamdb.wsgi:application", "--bind", "0:8000" ]

@@ -2,13 +2,18 @@
 
 ### Установка
 
-`git clone git@github.com:bitbybit/api_yamdb.git`
+1. `git clone git@github.com:bitbybit/api_yamdb.git`
+
+2. Заполнить файл `.env` (пример в `.env.example`)
 
 #### Docker
 
 ```
-docker build -t yamdb .
-docker run --name yamdb -it -p 8000:8000 yamdb
+docker-compose up -d
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py import_csv
+docker-compose exec web python manage.py collectstatic --no-input
+docker-compose exec web python manage.py createsuperuser
 ```
 
 #### Вручную
@@ -21,8 +26,6 @@ source venv/bin/activate
 
 python3 -m pip install --upgrade pip
 pip3 install -r requirements.txt
-pip3 install django-filter
-pip3 install djangorestframework-simplejwt
 
 cd api_yamdb
 python manage.py migrate
