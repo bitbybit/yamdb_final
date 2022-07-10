@@ -2,19 +2,21 @@
 
 ### Установка
 
-1. `git clone git@github.com:bitbybit/api_yamdb.git`
+1. `git clone git@github.com:bitbybit/infra_sp2.git`
 
-2. Заполнить файл `.env` (пример в `.env.example`)
+2. Заполнить файл `.env` / `infra/.env` (пример в `infra/.env.example`)
 
 #### Docker
 
 ```
-docker-compose up -d
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py import_csv
-docker-compose exec web python manage.py collectstatic --no-input
-docker-compose exec web python manage.py createsuperuser
+docker-compose -f ./infra/docker-compose.yaml up -d
+docker-compose -f ./infra/docker-compose.yaml exec web python manage.py migrate
+docker-compose -f ./infra/docker-compose.yaml exec web python manage.py import_csv
+docker-compose -f ./infra/docker-compose.yaml exec web python manage.py collectstatic --no-input
+docker-compose -f ./infra/docker-compose.yaml exec web python manage.py createsuperuser
 ```
+
+[Docker Hub](https://hub.docker.com/repository/docker/hubhubhubhub/api_yamdb)
 
 #### Вручную
 
@@ -25,7 +27,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 python3 -m pip install --upgrade pip
-pip3 install -r requirements.txt
+pip3 install -r api_yamdb/requirements.txt
 
 cd api_yamdb
 python manage.py migrate
