@@ -2,8 +2,18 @@
 
 ### Установка
 
+`git clone git@github.com:bitbybit/api_yamdb.git`
+
+#### Docker
+
 ```
-git clone git@github.com:bitbybit/api_yamdb.git
+docker build -t yamdb .
+docker run --name yamdb -it -p 8000:8000 yamdb
+```
+
+#### Вручную
+
+```
 cd api_yamdb
 
 python3 -m venv venv
