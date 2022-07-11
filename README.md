@@ -6,6 +6,26 @@
 
 2. Заполнить файл `.env` / `infra/.env` (пример в `infra/.env.example`)
 
+```
+# указываем, что работаем с postgresql
+DB_ENGINE=django.db.backends.postgresql
+
+# имя базы данных
+DB_NAME=
+
+# логин для подключения к базе данных
+POSTGRES_USER=
+
+# пароль для подключения к БД
+POSTGRES_PASSWORD=
+
+# название сервиса (контейнера)
+DB_HOST=db
+
+# порт для подключения к БД
+DB_PORT=5432
+```
+
 #### Docker
 
 ```
