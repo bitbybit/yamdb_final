@@ -1,8 +1,10 @@
+![yamdb_workflow](https://github.com/bitbybit/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+
 ## Окружение
 
 ### Установка
 
-1. `git clone git@github.com:bitbybit/infra_sp2.git`
+1. `git clone git@github.com:bitbybit/yamdb_final.git`
 
 2. Заполнить файл `.env` / `infra/.env` (пример в `infra/.env.example`)
 
@@ -36,7 +38,7 @@ docker-compose -f ./infra/docker-compose.yaml exec web python manage.py collects
 docker-compose -f ./infra/docker-compose.yaml exec web python manage.py createsuperuser
 ```
 
-[Docker Hub](https://hub.docker.com/repository/docker/hubhubhubhub/api_yamdb)
+[Docker Hub](https://hub.docker.com/repository/docker/hubhubhubhub/yamdb_final)
 
 #### Вручную
 
